@@ -14,9 +14,16 @@
 ``` python
 from pdflite import pdf_md
 
-md    = pdf_md('statement.pdf', out_path='out')              # one string, pages joined by ---
-pages = pdf_md('statement.pdf', out_path='out', pages=True)  # one entry per page
+md = pdf_md('pdfs/attention_is_all_you_need.pdf', out_path='out'); md[:100] # out_path stores images
+# pages = pdf_md('statement.pdf', out_path='out', pages=True)  # one entry per page
 ```
+
+    Dictionary used where Stream expected, treating as empty stream
+    Dictionary used where Stream expected, treating as empty stream
+    Dictionary used where Stream expected, treating as empty stream
+    Dictionary used where Stream expected, treating as empty stream
+
+    'Provided proper attribution is provided, Google hereby grants permission to reproduce the tables and'
 
 Each fix is exported on its own: [`clean_md`](https://vedicreader.github.io/pdflite/core.html#clean_md), [`fix_layout`](https://vedicreader.github.io/pdflite/core.html#fix_layout), [`orphan_vals`](https://vedicreader.github.io/pdflite/core.html#orphan_vals),
 [`scrambled_layout`](https://vedicreader.github.io/pdflite/core.html#scrambled_layout), [`needs_ocr`](https://vedicreader.github.io/pdflite/core.html#needs_ocr), [`ocr_parse`](https://vedicreader.github.io/pdflite/core.html#ocr_parse), [`oxide_parse`](https://vedicreader.github.io/pdflite/core.html#oxide_parse).
@@ -25,9 +32,13 @@ Each fix is exported on its own: [`clean_md`](https://vedicreader.github.io/pdfl
 clean_md('a docu-\nment')      # a hyphen split across lines
 ```
 
+    'a document'
+
 ``` python
 orphan_vals('Opening balance\nFees\n1,240.00\n18.50')   # values cut loose from their labels
 ```
+
+    2
 
 ## Install
 
