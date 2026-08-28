@@ -1,21 +1,21 @@
 # Working in this repo
 
 nbdev. The notebooks under `nbs/` are the source; `pdflite/*.py` is generated. Edit the notebook,
-run `nbdev_export`, never edit the `.py`. CI runs `nbdev_export` and fails on a diff.
+run `nbdev_export`, never edit the `.py`. `README.md` comes from `nbs/index.ipynb` through
+`nbdev_readme`. CI runs `nbdev_export` and fails on a diff.
 
 ## What belongs here
 
-Anything that turns a PDF into text and repairs what conversion broke. litesearch, fossick and
-kosha all import from here, so a fix lands once.
+Anything that turns a PDF into text and repairs what conversion broke.
 
-Chunking does not belong here. Neither does anything that knows about an index, a vault or a
-document tree. `pdf_md` returns markdown and stops.
+Chunking does not. Neither does anything that knows about an index, a vault or a document tree.
+`pdf_md` returns markdown and stops.
 
 ## The two shapes
 
 `pdf_md(pages=False)` returns one string, pages joined by `---`. `pages=True` returns a list, one
-entry per page, which is what a chunker that cites page numbers needs. Both come from the same
-pass, so they cannot disagree.
+entry per page, which is what a chunker citing page numbers needs. Both come from the same pass,
+so they cannot disagree.
 
 ## Dependencies
 
