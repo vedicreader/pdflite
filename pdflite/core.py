@@ -100,7 +100,7 @@ def pdf_md(pdf:str|Path|bytes|PdfDocument,
            **kw                       # forwarded to oxide_parse and, on the OCR path, LiteParse
 ) -> str|list:
     'A PDF as markdown, with layout repaired and OCR where the page was scanned.'
-    md = [p.text for p in pdf_pages(pdf, out_path, ocr, preserve_layout, **kw)]
+    md = [p['text'] for p in pdf_pages(pdf, out_path, ocr, preserve_layout, **kw)]
     return md if pages else '\n---\n'.join(md)
 
 @fdelegates(oxide_parse)
