@@ -13,4 +13,6 @@ d = { 'settings': { 'branch': 'main',
                               'pdflite.core.oxide_parse': ('core.html#oxide_parse', 'pdflite/core.py'),
                               'pdflite.core.pdf_doc': ('core.html#pdf_doc', 'pdflite/core.py'),
                               'pdflite.core.pdf_md': ('core.html#pdf_md', 'pdflite/core.py'),
-                              'pdflite.core.scrambled_layout': ('core.html#scrambled_layout', 'pdflite/core.py')}}}
+                              'pdflite.core.pdf_pages': ('core.html#pdf_pages', 'pdflite/core.py'),
+                              'pdflite.core.scrambled_layout': ('core.html#scrambled_layout', 'pdflite/core.py'),
+                              'pdflite.core.thin_text': ('core.html#thin_text', 'pdflite/core.py')}}}
