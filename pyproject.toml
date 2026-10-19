@@ -42,5 +42,8 @@ include = ["/pdflite", "/README.md", "/pyproject.toml"]
 [tool.hatch.version]
 path = "pdflite/__init__.py"
 
-[dependency-groups]
+[project.optional-dependencies]
 dev = ["ipykernel>=7.3.0", "nbdev>=3.3.4", "notebook>=7.6.1", "liteparse>=2.6.0"]
+
+[dependency-groups]
+dev = ["pdflite[dev]"]
