@@ -12,7 +12,7 @@ from pdf_oxide import PdfDocument
 
 # %% ../nbs/00_core.ipynb #4620d94de4dd
 def pdf_doc(pdf:str|Path|bytes|PdfDocument) -> PdfDocument:
-    'A `PdfDocument` from a path, bytes or one you already have.'
+    "Return a `PdfDocument` from a path, PDF bytes, or a document you already have."
     if isinstance(pdf, PdfDocument): return pdf
     return PdfDocument.from_bytes(pdf) if isinstance(pdf, bytes) else PdfDocument(str(pdf))
 
@@ -22,7 +22,7 @@ _CHROME = re.compile(r'Press enter or click to view [^\n]+\n?', re.I)
 def clean_md(md:str,                       # markdown from a PDF page
              preserve_layout:bool=False    # keep indentation and space runs, which a table needs
 ) -> str:
-    'Rejoin hyphenated words, drop reader chrome, collapse the whitespace conversion leaves behind.'
+    "Join words split by a hyphen at a line end, remove Medium reader lines, and tidy whitespace."
     md = _CHROME.sub('', md)
     md = re.sub(r'([a-z])-\n([a-z])', r'\1\2', md)    # "docu-\nment" is one word
     md = re.sub(r'([a-z])-\n([A-Z])', r'\1-\2', md)   # "co-\nOperative" keeps its hyphen
@@ -35,20 +35,20 @@ def clean_md(md:str,                       # markdown from a PDF page
 _ORPHAN = re.compile(r'^[\$\-\s]*[\d,]+\.\d{2}\s*$', flags=re.M)
 
 def orphan_vals(md:str) -> int:
-    'Lines holding a money value and nothing else, which is what a reflowed column leaves behind.'
+    "Count the lines that hold only a money amount, which is what a flattened table leaves behind."
     return len(_ORPHAN.findall(md))
 
 def scrambled_layout(md:str) -> bool:
-    'True when the text layer is fine but conversion cut values loose from their labels.'
+    "Return True when conversion separated amounts from their labels on this page."
     return orphan_vals(md) > 0
 
 def needs_ocr(md:str) -> bool:
-    'True when pdf-oxide flagged the page as scanned, so there is no text layer to read.'
+    "Return True when pdf-oxide marked the page as scanned, with no text layer to read."
     return '> [OCR REQUIRED' in md.strip()
 
 _IMG = re.compile(r'!\[[^\]]*\]\([^)]*\)')
 def thin_text(md:str, min_chars:int=20) -> bool:
-    'True when a page holds an image and under `min_chars` letters besides: a scan pdf-oxide did not flag.'
+    "Return True when a page holds an image and fewer than `min_chars` letters besides, a scan pdf-oxide did not mark."
     return bool(_IMG.search(md)) and len(re.sub(r'[\W\d_]', '', _IMG.sub('', md))) < min_chars
 
 def fix_layout(pdf:PdfDocument,             # the document the page came from
@@ -56,7 +56,7 @@ def fix_layout(pdf:PdfDocument,             # the document the page came from
                md:str,                      # that page's markdown
                preserve_layout:bool=False
 ) -> str:
-    'Swap a scrambled page for its plain-text layer, but only if that strands fewer values.'
+    "Replace a page whose amounts came apart from their labels with its plain-text layer, if that separates fewer."
     if not scrambled_layout(md): return md
     txt = clean_md(pdf.to_plain_text(page, preserve_layout), preserve_layout)
     return txt if txt.strip() and orphan_vals(txt) < orphan_vals(md) else md
@@ -68,7 +68,7 @@ def ocr_parse(pdf:str|Path|bytes|PdfDocument,   # the document to scan
               pages:list=None,                  # 0-based pages to scan; all when None
               **kw                              # forwarded to LiteParse (num_workers, ...)
 ):
-    'Run OCR over a scanned PDF. Returns the LiteParse result, whose `.pages` carry the text and a 1-based `page_num`.'
+    "Read a scanned PDF with OCR and return liteparse's result, whose `.pages` hold the text and a page number counted from 1."
     try: from liteparse import LiteParse
     except ImportError as e: raise ImportError('OCR needs liteparse: pip install liteparse') from e
     if pages is not None: kw['target_pages'] = ','.join(str(p + 1) for p in pages)
@@ -80,7 +80,7 @@ def oxide_parse(pdf:str|Path|bytes|PdfDocument,
                 image_dir:str='images',     # subdir under `out_path` for extracted images
                 **kw                        # forwarded to pdf-oxide
 ) -> tuple:
-    'Every page as cleaned, layout-repaired markdown, and whether any page wants OCR.'
+    "Convert every page with pdf-oxide, clean and repair it, and return the pages and whether any of them needs OCR."
     doc = pdf_doc(pdf)
     imdir = Path(out_path or 'pdfs').resolve()/image_dir
     imdir.mkdir(exist_ok=True, parents=True)
@@ -99,7 +99,7 @@ def pdf_md(pdf:str|Path|bytes|PdfDocument,
            preserve_layout:bool=False,
            **kw                       # forwarded to oxide_parse and, on the OCR path, LiteParse
 ) -> str|list:
-    'A PDF as markdown, with layout repaired and OCR where the page was scanned.'
+    "Convert a PDF to markdown, repairing the layout and reading scanned pages with OCR."
     md = [p['text'] for p in pdf_pages(pdf, out_path, ocr, preserve_layout, **kw)]
     return md if pages else '\n---\n'.join(md)
 
@@ -110,7 +110,7 @@ def pdf_pages(pdf:str|Path|bytes|PdfDocument,
               preserve_layout:bool=False,
               **kw
 ) -> list:
-    'Each page as `{page, text, route}`: `text` from the text layer, `ocr` from LiteParse, or `scanned` when OCR was off or read nothing.'
+    "Convert a PDF and return each page as `{page, text, route}`, where `route` says how the page was read."
     md, _ = oxide_parse(pdf, out_path, preserve_layout, **kw)
     out = [dict(page=i, text=t, route='scanned' if needs_ocr(t) or thin_text(t) else 'text') for i, t in enumerate(md)]
     want = [r['page'] for r in out if ocr == 'on' or (ocr == 'auto' and r['route'] == 'scanned')]
